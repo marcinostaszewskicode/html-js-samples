@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zmiana klas CSS przez JavaScript – lekcja</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #f0f4f8;
+    }
+
+    /* ========== GÓRNA POŁOWA – SCENA ========== */
+    #stage {
+      height: 50vh;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 24px;
+      align-items: center;
+      justify-content: center;
+      background: #e0f2fe;
+      transition: background-color 0.6s ease;
+      overflow: hidden;
+    }
+
+    /* Podstawowe style pudełek */
+    .box {
+      width: 140px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: white;
+      border-radius: 12px;
+      transition: all 0.5s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .box-a { background: #3b82f6; }
+    .box-b { background: #10b981; }
+    .box-c { background: #f59e0b; }
+    .box-d { background: #ef4444; }
+
+    /* --- Klasy, które będą dodawane / usuwane przez JS --- */
+
+    /* Zmiana układu */
+    .layout-column {
+      flex-direction: column;
+    }
+
+    .layout-reverse {
+      flex-direction: row-reverse;
+    }
+
+    .big-gap {
+      gap: 40px;
+    }
+
+    /* Zmiana wyglądu pojedynczych elementów */
+    .huge {
+      width: 220px;
+      height: 160px;
+      font-size: 1.6rem;
+    }
+
+    .tiny {
+      width: 80px;
+      height: 60px;
+      font-size: 0.8rem;
+    }
+
+    .rounded-full {
+      border-radius: 50%;
+    }
+
+    .rotated {
+      transform: rotate(15deg);
+    }
+
+    .shadow-strong {
+      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+    }
+
+    /* Tryb ciemny / odwrócony */
+    .dark-mode {
+      background: #1e293b !important;
+      color: #f1f5f9;
+    }
+
+    .dark-mode .box {
+      filter: brightness(0.85);
+    }
+
+    .inverted {
+      filter: invert(1);
+    }
+
+    /* Klasy kolorów tła (używane przez select) */
+    .bg-sky   { background: #e0f2fe; }
+    .bg-rose  { background: #ffe4e6; }
+    .bg-lime  { background: #ecfccb; }
+    .bg-amber { background: #fef3c7; }
+    .bg-violet{ background: #ede9fe; }
+
+    /* Napis, którego rozmiar zmienia input numeryczny */
+    #title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #1e40af;
+      transition: font-size 0.3s ease;
+      margin-bottom: 12px;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* ========== DOLNA POŁOWA – PANELE STERUJĄCE ========== */
+    #controls {
+      height: 50vh;
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+      background: #1e293b;
+      color: white;
+    }
+
+    .panel {
+      flex: 1;
+      background: #334155;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.9rem;
+    }
+
+    .panel h3 {
+      font-size: 1rem;
+      margin-bottom: 6px;
+      color: #93c5fd;
+      border-bottom: 1px solid #475569;
+      padding-bottom: 6px;
+    }
+
+    button, select, input {
+      padding: 8px 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    button {
+      background: #3b82f6;
+      color: white;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== GÓRNA SCENA ==================== -->
+  <div id="stage" class="bg-sky">
+    <div id="title">Zmieniamy klasy CSS!</div>
+
+    <div class="box box-a" id="boxA">A</div>
+    <div class="box box-b" id="boxB">B</div>
+    <div class="box box-c" id="boxC">C</div>
+    <div class="box box-d" id="boxD">D</div>
+  </div>
+
+  <!-- ==================== DOLNE STEROWANIE ==================== -->
+  <div id="controls">
+
+    <!-- ========== PANEL A – 4 przyciski ========== -->
+    <div class="panel">
+      <h3>A – Przyciski (duże zmiany)</h3>
+
+      <button id="btn1">Układ kolumnowy + duże gap</button>
+      <button id="btn2">Odwróć kolejność + obróć</button>
+      <button id="btn3">Powiększ A i D + mocny cień</button>
+      <button id="btn4">Zresetuj wygląd</button>
+
+      <script>
+        // ===== FUNKCJE DLA PANELU A =====
+        function ustawKolumne() {
+          const stage = document.getElementById("stage");
+          stage.classList.remove("layout-reverse");
+          stage.classList.add("layout-column", "big-gap");
+        }
+
+        function odwrocIObroc() {
+          const stage = document.getElementById("stage");
+          stage.classList.add("layout-reverse");
+          document.getElementById("boxB").classList.add("rotated");
+          document.getElementById("boxC").classList.add("rotated");
+        }
+
+        function powiekszAD() {
+          document.getElementById("boxA").classList.add("huge", "shadow-strong");
+          document.getElementById("boxD").classList.add("huge", "shadow-strong");
+          document.getElementById("boxB").classList.add("tiny");
+          document.getElementById("boxC").classList.add("tiny");
+        }
+
+        function resetuj() {
+          const stage = document.getElementById("stage");
+          stage.classList.remove("layout-column", "layout-reverse", "big-gap");
+
+          ["boxA", "boxB", "boxC", "boxD"].forEach(id => {
+            const el = document.getElementById(id);
+            el.classList.remove("huge", "tiny", "rotated", "shadow-strong", "rounded-full");
+          });
+        }
+
+        // ===== EVENT LISTENERY PANELU A =====
+        document.getElementById("btn1").addEventListener("click", ustawKolumne);
+        document.getElementById("btn2").addEventListener("click", odwrocIObroc);
+        document.getElementById("btn3").addEventListener("click", powiekszAD);
+        document.getElementById("btn4").addEventListener("click", resetuj);
+      </script>
+    </div>
+
+    <!-- ========== PANEL B – 2 checkboxy ========== -->
+    <div class="panel">
+      <h3>B – Checkboxy (toggle)</h3>
+
+      <label>
+        <input type="checkbox" id="checkDark">
+        Tryb ciemny (dark-mode)
+      </label>
+
+      <label>
+        <input type="checkbox" id="checkInvert">
+        Odwróć kolory (inverted)
+      </label>
+
+      <script>
+        // ===== FUNKCJE DLA PANELU B =====
+        function toggleDark() {
+          document.getElementById("stage").classList.toggle("dark-mode");
+        }
+
+        function toggleInvert() {
+          document.getElementById("stage").classList.toggle("inverted");
+        }
+
+        // ===== EVENT LISTENERY PANELU B =====
+        document.getElementById("checkDark").addEventListener("change", toggleDark);
+        document.getElementById("checkInvert").addEventListener("change", toggleInvert);
+      </script>
+    </div>
+
+    <!-- ========== PANEL C – Select z kolorami ========== -->
+    <div class="panel">
+      <h3>C – Select (tylko tło)</h3>
+
+      <select id="colorSelect">
+        <option value="bg-sky">Błękitny (sky)</option>
+        <option value="bg-rose">Różowy (rose)</option>
+        <option value="bg-lime">Limonkowy (lime)</option>
+        <option value="bg-amber">Bursztynowy (amber)</option>
+        <option value="bg-violet">Fioletowy (violet)</option>
+      </select>
+
+      <script>
+        // ===== FUNKCJA DLA PANELU C =====
+        function zmienTlo() {
+          const stage = document.getElementById("stage");
+          // najpierw usuwamy wszystkie klasy kolorów tła
+          stage.classList.remove("bg-sky", "bg-rose", "bg-lime", "bg-amber", "bg-violet");
+          // dodajemy wybraną
+          stage.classList.add(this.value);
+        }
+
+        // ===== EVENT LISTENER PANELU C =====
+        document.getElementById("colorSelect").addEventListener("change", zmienTlo);
+      </script>
+    </div>
+
+    <!-- ========== PANEL D – Input tekstowy ========== -->
+    <div class="panel">
+      <h3>D – Input (dodaje klasę)</h3>
+
+      <p style="font-size:0.8rem; opacity:0.8;">
+        Wpisz nazwę klasy (np. rounded-full, rotated, huge) i naciśnij Enter lub kliknij poza pole.
+      </p>
+
+      <input type="text" id="classInput" placeholder="np. rounded-full">
+
+      <script>
+        // ===== FUNKCJA DLA PANELU D =====
+        function dodajKlase() {
+          const wartosc = this.value.trim();
+          if (wartosc === "") return;
+
+          // dodajemy wpisaną klasę do elementu B
+          document.getElementById("boxB").classList.add(wartosc);
+
+          // opcjonalnie czyścimy pole
+          // this.value = "";
+        }
+
+        // ===== EVENT LISTENER PANELU D =====
+        // "change" działa po opuszczeniu pola lub naciśnięciu Enter
+        document.getElementById("classInput").addEventListener("change", dodajKlase);
+      </script>
+    </div>
+
+    <!-- ========== PANEL E – Input numeryczny ========== -->
+    <div class="panel">
+      <h3>E – Wielkość czcionki</h3>
+
+      <label>
+        Rozmiar napisu (1–40):
+        <input type="number" id="fontSizeInput" min="1" max="40" value="18">
+      </label>
+
+      <script>
+        // ===== FUNKCJA DLA PANELU E =====
+        function zmienRozmiarCzcionki() {
+          const rozmiar = this.value;
+          document.getElementById("title").style.fontSize = rozmiar + "px";
+        }
+
+        // ===== EVENT LISTENER PANELU E =====
+        document.getElementById("fontSizeInput").addEventListener("input", zmienRozmiarCzcionki);
+      </script>
+    </div>
+
+  </div>
+
+</body>
+</html>
