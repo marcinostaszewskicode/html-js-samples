@@ -293,10 +293,12 @@
       <script>
         // ===== FUNKCJA DLA PANELU C =====
         function zmienTlo() {
+          console.log("zmienione tło");
           const stage = document.getElementById("stage");
           // najpierw usuwamy wszystkie klasy kolorów tła
           stage.classList.remove("bg-sky", "bg-rose", "bg-lime", "bg-amber", "bg-violet");
-          // dodajemy wybraną
+          // dodajemy wybraną klasę
+          console.log(this, this.value);
           stage.classList.add(this.value);
         }
 
