@@ -89,7 +89,7 @@
     }
 
     .shadow-strong {
-      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.65);
     }
 
     /* Tryb ciemny / odwrócony */
@@ -319,11 +319,20 @@
       <script>
         // ===== FUNKCJA DLA PANELU D =====
         function dodajKlase() {
+          const boxB = document.getElementById("boxB");
           const wartosc = this.value.trim();
           if (wartosc === "") return;
 
           // dodajemy wpisaną klasę do elementu B
-          document.getElementById("boxB").classList.add(wartosc);
+          if (wartosc.includes(" ")) {
+            const klasy = wartosc.split(" ");
+            klasy.forEach(klasa => {
+              boxB.classlist.add(klasa)
+            })
+          }
+          else {
+            boxB.classList.add(wartosc);
+          }
 
           // opcjonalnie czyścimy pole
           // this.value = "";
