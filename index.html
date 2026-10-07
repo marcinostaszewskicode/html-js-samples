@@ -24,7 +24,7 @@
       height: 50vh;
       display: flex;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 40px;
       padding: 12px;
       align-items: center;
       justify-content: center;
@@ -63,8 +63,8 @@
       flex-direction: row-reverse;
     }
 
-    .big-gap {
-      gap: 40px;
+    .small-gap {
+      gap: 10px;
     }
 
     /* Zmiana wyglądu pojedynczych elementów */
@@ -212,7 +212,7 @@
         function ustawKolumne() {
           const stage = document.getElementById("stage");
           stage.classList.remove("layout-reverse");
-          stage.classList.add("layout-column", "big-gap");
+          stage.classList.add("layout-column", "small-gap");
         }
 
         function odwrocIObroc() {
@@ -231,7 +231,7 @@
 
         function resetuj() {
           const stage = document.getElementById("stage");
-          stage.classList.remove("layout-column", "layout-reverse", "big-gap");
+          stage.classList.remove("layout-column", "layout-reverse", "small-gap");
 
           ["boxA", "boxB", "boxC", "boxD"].forEach(id => {
             const el = document.getElementById(id);
